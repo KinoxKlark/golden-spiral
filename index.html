@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Fonctions Holomorphes</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css" type="text/css" />
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Golden Spiral</h1>
+        </header>
+
+        <div class="row">
+            <div id="spiral" class="col-12 col-md-8">
+                <canvas id="spiral-canvas" width="1000px" height="1000px"></canvas>
+            </div>
+            <div id="fraction" class="col-12 col-md-4">
+
+                <input id="number" type="number" onchange="updateNumber()" value="" step="0.01" min="0" />
+                <hr/>
+
+                <h2>Presets</h2>
+                <button id="preset-phi"    class="btn" onclick="document.getElementById('number').value = (1+Math.sqrt(5))/2; updateNumber();">$\varphi$</button>
+                <button id="preset-pi"     class="btn" onclick="document.getElementById('number').value = Math.PI;            updateNumber();">$\pi$</button>
+                <button id="preset-sqrt2"  class="btn" onclick="document.getElementById('number').value = Math.sqrt(2);       updateNumber();">$\sqrt{2}$</button>
+                <button id="preset-sqrt3"  class="btn" onclick="document.getElementById('number').value = Math.sqrt(3);       updateNumber();">$\sqrt{3}$</button>
+                <hr/>
+
+                <h2>Continued fraction</h2>
+                <div id="latex"></div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+    </script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+
+    <script src="javascript/script.js"></script>
+
+    <script>
+
+        var canvas = document.getElementById('spiral-canvas');
+        var phi = (1+Math.sqrt(5))/2;
+
+        document.getElementById("number").value = phi;
+
+        updateNumber();
+
+        function updateNumber()
+        {
+            var number = document.getElementById("number").value;
+            drawSpiral(number, canvas);
+
+            var seq = getContinuedFractionSequence(number, 5);
+            var fraction = writeFraction(seq);
+
+            function writeFraction(seq) {
+                var fraction = "";
+                var integer = seq.shift();
+                if(integer == -1) return "\\ddots";
+                if(integer != 0) fraction += integer;
+                if(integer != 0 && seq.length > 0) fraction += " + ";
+                if(seq.length > 0) fraction += "\\frac{1}{"+writeFraction(seq)+"}";
+                return fraction;
+            }
+
+            document.getElementById('latex').innerHTML = "$$"+fraction+"$$";
+            if(typeof MathJax !== 'undefined') MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        }
+
+    </script>
+</body>
+</html>
